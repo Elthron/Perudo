@@ -5,6 +5,7 @@
 #include <utility>
 #include "Die.h"
 
+//in this game a "bid" is a std::pair of ints: 4 2s -> std::pair<unsigned int,unsigned int> {4,2}
 typedef std::pair<unsigned int,unsigned int> Bid;
 
 class Player
