@@ -25,12 +25,12 @@ unsigned int wheel::size()
 
 wheel::iterator wheel::begin()
 {
-	return iterator(vec);
+	return iterator(*this);
 }
 
 wheel::iterator wheel::last()
 {
-	return iterator(vec,vec.size()-1)
+	return iterator(*this,vec.size()-1);
 }
 
 T wheel::front()
@@ -43,14 +43,14 @@ T wheel::back()
 	return vec.back();
 }
 
-wheel::iterator::iterator(std::vector<T>& _vec,unsigned int _index/*=0*/):
-	vec(_vec),
+wheel::iterator::iterator(std::vector<T>& _wh,unsigned int _index/*=0*/):
+	wh(_wh),
 	index(_index)
 {}
 
 wheel::iterator& wheel::iterator::operator++()
 {
-	index=(index==vec.size()-1) ? 0 : index+1;
+	index=(index==wh.size()-1) ? 0 : index+1;
 	return *this;
 }
 
@@ -63,7 +63,7 @@ wheel::iterator wheel::iterator::operator++(int)
 
 wheel::iterator& wheel::iterator::operator--()
 {
-	index=(!index) ? vec.size()-1 : index-1;
+	index=(!index) ? wh.size()-1 : index-1;
 	return *this;
 }
 
@@ -74,19 +74,29 @@ wheel::iterator wheel::iterator::operator--(int)
 	 return retval;
 }
 
-bool operator==(iterator other) const
+bool wheel::iterator::operator==(iterator other) const
 {
 	return index==other.index;
 }
 
-bool operator!=(iterator other) const
+bool wheel::iterator::operator!=(iterator other) const
 {
 	return !(*this==other);
 }
 
-reference operator*() const
+T& wheel::iterator::operator*() const
 {
-	return vec[index];
+	return wh[index];
+}
+
+wheel::iterator operator+(const iterator& lhs, int& rhs)
+{
+	lhs.index+=rhs;
+}
+
+wheel::iterator operator-(const iterator& rhs, int& lhs)
+{
+	lhs.index-=rhs;
 }
 
 T& operator[] (const int index)
