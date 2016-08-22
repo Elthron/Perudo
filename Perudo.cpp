@@ -56,10 +56,16 @@ int main()
 		{
 			next_bid=player_it -> takeTurn( bids.back() );
 			
-			//if a bid was made, store it and move on to the next player's turn'
+			//if a bid was made, store it, broadcast it and move on to the next player's turn
 			if(next_bid)
 			{
 				bids.push_back(next_bid);
+				
+				for(unsigned int i=0;i<players.size();++i)
+				{
+					players[i].sendBid(next_bid);
+				}
+				
 				continue;
 			}
 			
@@ -103,13 +109,26 @@ int main()
 			delete *iter;
 			bids.erase(iter);
 		}
-		
 	}
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
 	//wait for the other thread to finish (which it should do soon as quit should now be set to true)
 	thread.join();
 	
 	return 0;
+}
+
+//function to run in separate thread watching for new clients
+watchForClients(std::atomic<bool>& quit,ThreadSafeList<int>& client_ids)
+{
+	int client_id;
+	
+	while(!quit.load())
+	{
+		//search for new clients somehow...
+		
+		if(/*something*/) client_ids.push_front(client_id);	//add the new client's id to the list
+	}
 }
 
 class addPlayer
@@ -125,16 +144,3 @@ class addPlayer
 	private:
 		wheel<Player*>& players;
 };
-
-//function to run in separate thread watching for new clients
-watchForClients(std::atomic<bool>& quit,ThreadSafeList<int>& client_ids)
-{
-	int client_id;
-	
-	while(!quit.load())
-	{
-		//search for new clients somehow...
-		
-		if(/*something*/) client_ids.push_front(client_id);	//add the new client's id to the list
-	}
-}
