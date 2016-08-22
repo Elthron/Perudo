@@ -8,6 +8,17 @@
 #include "wheel.h"
 #include "ThreadSafeList.h"
 
+//probably dont need all these, just here because im a lasy fuck
+#include <stdio.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <string.h>
+#include <utility>
+#include <iostream>
+
+
 //functor to create players from client ids
 class AddPlayer;
 
@@ -15,6 +26,36 @@ watchForClients(std::atomic<bool>& quit,ThreadSafeList& client_ids);
 
 int main()
 {
+	//this was mostly shamefully plaigerised from http://www.tutorialspoint.com/unix_sockets/
+	//set up the socket
+	int sockfd, newsockfd, portno;
+	unsigned int clilen;
+	char buffer[256];
+	struct sockaddr_in serv_addr, cli_addr;
+	//int  n;
+   
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+   
+   	if (sockfd < 0) {
+    	perror("ERROR opening socket");
+      	exit(1);
+   	}
+   
+   	/* Initialize socket structure */
+   	bzero((char *) &serv_addr, sizeof(serv_addr));
+   	portno = 5001; //this is the important thing thats clients need to know in order to join
+   
+   	serv_addr.sin_family = AF_INET;
+   	serv_addr.sin_addr.s_addr = INADDR_ANY;
+   	serv_addr.sin_port = htons(portno);
+   
+   	/* Now bind the host address using bind() call.*/
+   	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+    	perror("ERROR on binding");
+      	exit(1);
+   	}
+	
+	
 	//seed the dice
 	unsigned int seed=std::chrono::system_clock::now().time_since_epoch().count();
 	Die::seed(seed);
@@ -126,16 +167,23 @@ class addPlayer
 		wheel<Player*>& players;
 };
 
-//function to run in separate thread watching for new clients
-watchForClients(std::atomic<bool>& quit,ThreadSafeList<int>& client_ids)
+//function to run in separate thread watching for new clientslisten(sockfd,5);
+
+watchForClients(std::atomic<bool>& quit,ThreadSafeList<int>& client_ids
+	int sockfd , int numOfConnections, struct sockaddr_in clilen)
 {
 	int client_id;
 	
 	while(!quit.load())
 	{
-		//search for new clients somehow...
 		//added listen feature 22/08/16 jhb
-		
+		listen(sockfd,numOfConnections); 
+		clilen = sizeof(cli_addr);
+		/* Accept actual connection from the client */
+		client_id = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+		if (client_id < 0) {
+		//error handling
+		}  
 		if(/*something*/) client_ids.push_front(client_id);	//add the new client's id to the list
 	}
 }
