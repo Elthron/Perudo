@@ -170,7 +170,7 @@ class addPlayer
 //function to run in separate thread watching for new clientslisten(sockfd,5);
 
 watchForClients(std::atomic<bool>& quit,ThreadSafeList<int>& client_ids
-	int sockfd , int numOfConnections, struct sockaddr_in clilen)
+	int sockfd , int numOfConnections,  sockaddr_in &cli_addr)
 {
 	int client_id;
 	
