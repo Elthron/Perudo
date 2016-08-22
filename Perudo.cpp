@@ -134,6 +134,7 @@ watchForClients(std::atomic<bool>& quit,ThreadSafeList<int>& client_ids)
 	while(!quit.load())
 	{
 		//search for new clients somehow...
+		//added listen feature 22/08/16 jhb
 		
 		if(/*something*/) client_ids.push_front(client_id);	//add the new client's id to the list
 	}
