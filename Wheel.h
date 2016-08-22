@@ -15,19 +15,24 @@ class wheel
 		class iterator : public std::iterator<std::bidirectional_iterator_tag,T,T,const T*,T>
 		{
 			public:
-				explicit iterator(std::vector<T>& _vec,unsigned int _index=0);
+				explicit iterator(wheel<T>& _wh,unsigned int _index=0);
 				
 				iterator& operator++();
 				iterator operator++(int);
 				iterator& operator--();
 				iterator operator--(int);
+				
+				friend iterator operator+(const iterator& lhs, int& rhs);
+				friend iterator operator-(const iterator& rhs, int& lhs);
+				
 				bool operator==(iterator other) const ;
 				bool operator!=(iterator other) const;
-				reference operator*() const;
+				
+				T& operator*() const;
 				
 				
 			private:
-				std::vector<T>& vec;
+				wheel<T>& wh;
 				unsigned int index;
 		};
 		
