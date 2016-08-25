@@ -16,8 +16,8 @@ class Player
 		
 		virtual Bid* takeTurn(Bid last_bid)=0;
 		virtual void sendBid(Bid bid)=0;
-		bool removeDice();
-		unsigned int countDice(unsigned int number) const;
+		virtual bool removeDice();
+		virtual unsigned int countDice(unsigned int number) const;
 		
 	private:
 		std::vector<Die> Dice;
