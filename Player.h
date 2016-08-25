@@ -12,15 +12,14 @@ typedef std::pair<unsigned int,unsigned int> Bid;
 class Player
 {
 	public:
-		Player(int _client_id,unsigned int die_size);
+		Player(unsigned int die_size);
 		
-		virtual Bid takeTurn(Bid last_bid)=0;
+		virtual Bid* takeTurn(Bid last_bid)=0;
 		virtual void sendBid(Bid bid)=0;
 		bool removeDice();
 		unsigned int countDice(unsigned int number) const;
 		
 	private:
-		int client_id;
 		std::vector<Die> Dice;
 };
 
