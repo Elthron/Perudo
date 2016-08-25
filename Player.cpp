@@ -1,7 +1,6 @@
 #include "Player.h"
 
-Player::Player(int _client_id,unsigned int die_size):
-	client_id(_client_id),
+Player::Player(unsigned int die_size):
 	dice( 5, Die(dice_size) )
 {}
 
