@@ -5,12 +5,6 @@ Player::Player(int _client_id,unsigned int die_size):
 	dice( 5, Die(dice_size) )
 {}
 
-Bid Player::takeTurn(Bid last_bid)
-{}
-
-void Player::sendBid(Bid bid)
-{}
-
 bool removeDice()
 {
 	dice.erase(dice.end()-1);
