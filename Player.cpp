@@ -4,13 +4,13 @@ Player::Player(unsigned int die_size):
 	dice( 5, Die(dice_size) )
 {}
 
-bool removeDice()
+virtual bool removeDice()
 {
 	dice.erase(dice.end()-1);
 	return dice.size();
 }
 
-unsigned int countDice(unsigned int value) const
+virtual unsigned int countDice(unsigned int value) const
 {
 	unsigned int count=0;
 	
