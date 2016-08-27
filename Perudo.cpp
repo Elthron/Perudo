@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "wheel.h"
 #include "ThreadSafeList.h"
+#include "Bid.h"
 
 //functor to create players from client ids
 class AddPlayer;
@@ -24,8 +25,6 @@ int main()
 	//functor to update the players
 	AddPlayer addPlayer(players);
 	
-	//in this game a "bid" is a std::pair of ints: 4 2s -> std::pair<unsigned int,unsigned int> {4,2}
-	typedef std::pair<unsigned int,unsigned int> Bid;
 	//list of all the bids in the game
 	std::list<Bid*> bids;
 	//the bid of the next player
