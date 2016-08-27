@@ -4,9 +4,7 @@
 #include <vector>
 #include <utility>
 #include "Die.h"
-
-//in this game a "bid" is a std::pair of ints: 4 2s -> std::pair<unsigned int,unsigned int> {4,2}
-typedef std::pair<unsigned int,unsigned int> Bid;
+#include "Bid.h
 
 //abstract base class to inherit humans and AIs from
 class Player
