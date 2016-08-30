@@ -22,12 +22,12 @@ class Die
 		
 	private:
 		//number of sides
-		const unsigned int sides;
+		unsigned int sides;
 		//initial value is set to 1
 		unsigned int current_value;
 		
 		//the distribution the dice uses to generate random numbers
-		std::uniform_int_distribution<double> distribution;
+		std::uniform_int_distribution<int> distribution;
 		//mersenne twister PRNG
 		static std::mt19937 twister;
 };
