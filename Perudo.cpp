@@ -5,7 +5,7 @@
 #include <thread>
 #include "Die.h"
 #include "Player.h"
-#include "wheel.h"
+#include "Wheel.h"
 #include "ThreadSafeList.h"
 #include "Bid.h"
 
