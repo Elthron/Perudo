@@ -1,20 +1,24 @@
 #ifndef BASICAI_H
 #define BASICAI_H
 
+#include <list>
 #include "Player.h"
 
 class BasicAI : public Player
 {
 	public:
-		explicit BasicAI(unsigned int _dice_size,std::vector<Bid*>& _bids);	//Bid type is defined in player class
+		explicit BasicAI(unsigned int _dice_size,std::list<Bid*>& _bids,unsigned int _total_dice);	//Bid type is defined in player class
 		
 		//function to ask the client to take their turn based on the last bid
-		Bid takeTurn(Bid last_bid)=0;
+		virtual Bid* takeTurn(Bid* last_bid);
 		//function to inform the player of other bids
-		void sendBid(Bid bid)=0;
+		virtual void sendBid(Bid*);
+		//function used when a player has been challenged to return the number of dice a player has that show the given value
+		virtual unsigned int countDice(unsigned int value);
 		
 	private:
-		std::vector<Bid*>& bids;
+		std::list<Bid*>& bids;
+		unsigned int total_dice;
 };
 
 #endif
