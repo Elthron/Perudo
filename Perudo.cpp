@@ -49,6 +49,12 @@ int main()
 		//create the players
 		client_ids.for_each(addPlayer);
 		
+		//roll the dice
+		for(unsigned int i=0;i<players.size();++i)
+		{
+			players[i]->roll();
+		}
+		
 		wheel::iterator player_it=players.begin();
 		
 		while(players.size()>1)
@@ -62,7 +68,7 @@ int main()
 				
 				for(unsigned int i=0;i<players.size();++i)
 				{
-					players[i].sendBid(next_bid);
+					players[i]->sendBid(next_bid);
 				}
 				
 				continue;
@@ -82,7 +88,7 @@ int main()
 				if( !( (*player_it) -> removeDice()) )
 				{
 					delete (player_it);
-					players.erase( player_it + 1 );
+					players.erase(player_it);
 				}
 			}
 			else
@@ -92,6 +98,12 @@ int main()
 					delete *(players_it-1);
 					players.erase(player_it-1);
 				}
+			}
+			
+			//once the challenge is completed, re-roll the dice
+			for(unsigned int i=0;i<players.size();++i)
+			{
+				players[i]->roll();
 			}
 		}
 		
