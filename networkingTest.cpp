@@ -136,7 +136,7 @@ void clientManager::broadcast(std::string message){
 
 	for (it=client_ids->begin(); it != client_ids->end(); ++it){
 		n = write(*it,buf,sizeof(message));
-		std::cout<<sizeof(buf)<<"\t"<<n<<std::endl;
+		std::cout<<sizeof(buf)<<"\t"<<n<<std::endl; //turns of the size of the pointer to buf is 8 bytes
 
 		if(n<0){
 			std::cout<<"something went horribly wrong"<<std::endl;
