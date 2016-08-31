@@ -8,7 +8,6 @@ to make a way of handling more than one client. This particular example allows
 know bugs:
 1.sometimes when the program ends and is started again, the socket is unable to
 bind, this is probably something to do with not closing the socket
-2.It only writes the first 8 characters of the message, no idea why
 
 Eventually clientManager will be in its own cpp
 
