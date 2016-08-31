@@ -17,6 +17,9 @@ class Player
 		virtual Bid* takeTurn(Bid* last_bid)=0;
 		//function to inform the player of other bids
 		virtual void sendBid(Bid* bid)=0;
+		
+		//function to roll the player's dice
+		virtual void roll();
 		//function to remove a dice from the player; returns false if there are no dice left after this
 		virtual bool removeDice();
 		//function used when a player has been challenged to return the number of dice a player has that show the given value
