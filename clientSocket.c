@@ -7,20 +7,22 @@
 #include <unistd.h>
 
 #include <string.h>
+#include <iostream>
+
 
 int main(int argc, char *argv[]) {
    int sockfd, portno, n;
    struct sockaddr_in serv_addr;
    struct hostent *server;
    
-   char buffer[256];
+   char buffer[512];
    
    if (argc < 3) {
       fprintf(stderr,"usage %s hostname port\n", argv[0]);
       exit(0);
    }
 	
-   portno = atoi(argv[2]);
+   portno = atoi(argv[2]);//some way of changing a char array to int, probably deprecated
    
    /* Create a socket point */
    sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -48,22 +50,16 @@ int main(int argc, char *argv[]) {
       exit(1);
    }
    
-   /* Now ask for a message from the user, this message
-      * will be read by server
-   */
-	
-   while(1){
+   /* Now read server response */
+   bzero(buffer,512);
+   n = read(sockfd, buffer, 511);
    
-      /* Now read server response */
-      bzero(buffer,256);
-      n = read(sockfd, buffer, 255);
-      
-      if (n < 0) {
-         perror("ERROR reading from socket");
-         exit(1);
-      }
-      printf("%s\n",buffer);
-	}
+   if (n < 0) {
+      perror("ERROR reading from socket");
+      exit(1);
+   }
+   std::string message(buffer);
+   std::cout<<n<<"\t"<<buffer<<std::endl;
 
    return 0;
 }
