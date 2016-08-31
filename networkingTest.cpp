@@ -136,7 +136,7 @@ void clientManager::broadcast(std::string message){
 	const void *buf = message.c_str(); //relic of c? obtain a pointer to c char array
 
 	for (it=client_ids->begin(); it != client_ids->end(); ++it){
-		n = write(*it,buf,sizeof(buf));
+		n = write(*it,buf,sizeof(message));
 		std::cout<<sizeof(buf)<<"\t"<<n<<std::endl;
 
 		if(n<0){
