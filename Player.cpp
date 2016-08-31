@@ -7,6 +7,14 @@ Player::Player(unsigned int die_size):
 Player::~Player()
 {}
 
+void Player::roll()
+{
+	for(unsigned int i=0 ; i<dice.size() ; ++i)
+	{
+		dice[i].roll();
+	}
+}
+
 bool Player::removeDice()
 {
 	dice.erase(dice.end()-1);
