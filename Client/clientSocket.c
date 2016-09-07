@@ -3,9 +3,7 @@
 
 #include <netdb.h>
 #include <netinet/in.h>
-
 #include <unistd.h>
-
 #include <string.h>
 
 int main(int argc, char *argv[]) {

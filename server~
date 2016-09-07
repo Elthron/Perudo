@@ -1,0 +1,25 @@
+#this is the make file for Perudo server
+
+#compiler definition
+CC = g++
+
+#compiler flags
+CFLAGS = -std=c++14 -Wall -Wextra -Werror -O3 -pedantic -pthread
+
+#objects list
+OBJECTS = Perudo.o Die.o Player.o Bid.o
+
+all: Server
+
+#object files needed for Perudo
+Server: $(OBJECTS)
+	$(CC) $(CFLAGS) -o Server $(OBJECTS)
+
+Perudo.o: ThreadSafeList.h Wheel.h Die.h Player.h Bid.h
+Die.o: Die.h
+Player.o: Player.h Die.h Bid.h
+bid.o: bid.h
+
+#remove all old o files
+clean: 
+	$(RM) Perudo *.o *~

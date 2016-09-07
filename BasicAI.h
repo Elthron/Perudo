@@ -7,7 +7,7 @@
 class BasicAI : public Player
 {
 	public:
-		explicit BasicAI(unsigned int _dice_size,std::list<Bid*>& _bids,unsigned int _total_dice);	//Bid type is defined in player class
+		explicit BasicAI(unsigned int _dice_size,std::list<Bid*>& _bids,unsigned int _total_dice);
 		
 		//function to ask the client to take their turn based on the last bid
 		virtual Bid* takeTurn(Bid* last_bid);

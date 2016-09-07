@@ -16,7 +16,7 @@ class ThreadSafeList
 			Node(const T& value) : data(std::make_shared<T>(value)) , next() {}
 			
 			std::mutex m;
-			std::unique_ptr <T> data;
+			std::shared_ptr <T> data;
 			std::unique_ptr<Node> next;
 		};
 	
@@ -49,13 +49,13 @@ class ThreadSafeList
 			
 			//acquire locks on the head and the first data node
 			Node* last_node=&head;
-			last_node->m->lock();
+			last_node->m.lock();
 			
 			Node* current_node=head.next.get();
 			
 			do
 			{
-				current_node->m->lock();
+				current_node->m.lock();
 				
 				//test the predicate against the current node
 				if(*(current_node->data) == predicate)	//destroy the node pointed to by current_node
@@ -67,14 +67,14 @@ class ThreadSafeList
 					last_node->next=std::move(current_node->next);
 					
 					//release the lock on last_node
-					last_node->m->unlock();
+					last_node.m.unlock();
 					
 					return;
 				}
 				
 				//step the node pointers forwards
 				//unlock the trailing node and set the pointer to point and the current node
-				last_node->m->unlock();
+				last_node->m.unlock();
 				last_node=current_node;
 				
 				//move the current node along one and acquire a lock
@@ -83,33 +83,33 @@ class ThreadSafeList
 			while(current_node);
 			
 			//release the final held lock (if it gets to this point current_node was NULL so was never locked)
-			last_node->m->unlock();
+			last_node->m.unlock();
 		}
 		
 		//enact "predicate" on the node::data of each element in the list
 		//predicate should be a function with an overload of () that takes a single argument of type T
 		template<typename U>
-		void for_each(const U& predicate)
+		void for_each(U& predicate)
 		{
 			//return on empty list
-			if(!head.next())return;
+			if(!head.next.get())return;
 			
 			//acquire locks on the head and the first data node
 			Node* last_node=&head;
-			last_node->m->lock();
+			last_node->m.lock();
 	
 			Node* current_node=head.next.get();
 			
 			
 			do
 			{
-				current_node->m->lock();
+				current_node->m.lock();
 				
-				predicate(current_node->data.get());
+				predicate( *( current_node->data.get() ) );
 				
 				//step the node pointers forwards
 				//unlock the trailing node and set the pointer to point and the current node
-				last_node->m->unlock();
+				last_node->m.unlock();
 				last_node=current_node;
 				
 				//move the current node along one and acquire a lock
@@ -118,9 +118,8 @@ class ThreadSafeList
 			while(current_node);
 			
 			//release the final held lock (if it gets to this point current_node was NULL so was never locked)
-			last_node->m->unlock();
+			last_node->m.unlock();
 		}
-		
 		
 };
 

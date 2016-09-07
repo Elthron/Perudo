@@ -16,7 +16,7 @@ Player.o: Player.h Die.h Bid.h
 Die.o: Die.h
 Bid.o: Bid.h
 clientManager.o: clientManager.h ThreadSafeList.h Human.h
-Human.o: Human.h Player.h clientManager.h
+Human.o: Human.h Player.h Bid.h clientManager.h
 
 .PHONY: clean
 clean:

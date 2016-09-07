@@ -2,17 +2,11 @@
 #include <vector>
 #include <list>
 #include <utility>
-#include <thread>
+#include "clientManager.h"
 #include "Die.h"
 #include "Player.h"
 #include "Wheel.h"
-#include "ThreadSafeList.h"
 #include "Bid.h"
-
-//functor to create players from client ids
-class AddPlayer;
-
-watchForClients(std::atomic<bool>& quit,ThreadSafeList& client_ids);
 
 int main()
 {
@@ -22,8 +16,6 @@ int main()
 	
 	//empty wheel of players
 	wheel<Player*> players;
-	//functor to update the players
-	AddPlayer addPlayer(players);
 	
 	//list of all the bids in the game
 	std::list<Bid*> bids;
@@ -33,21 +25,18 @@ int main()
 	//variable for totalling the dice counts during a challenge
 	unsigned int total=0;
 	
-	//flag to control the while loops in both threads
-	std::atomic<bool> quit(false);
+	//flag to control the while loop
+	bool quit=false;
 	
-	//thread-safe list of clients to be updated by a separate thread
-	ThreadSafeList<int> client_ids;
-	
-	//start new thread to handle clients
-	std::thread thread(watchForClients,quit,client_ids);
+	//the client manager
+	clientManager client_manager(8000);
 	
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//main loop
-	while(!quit.load())
+	while(!quit)
 	{
 		//create the players
-		client_ids.for_each(addPlayer);
+		client_manager.populate(players);
 		
 		//roll the dice
 		for(unsigned int i=0;i<players.size();++i)
@@ -55,11 +44,11 @@ int main()
 			players[i]->roll();
 		}
 		
-		wheel::iterator player_it=players.begin();
+		wheel<Player*>::iterator player_it=players.begin();
 		
 		while(players.size()>1)
 		{
-			next_bid=player_it -> takeTurn( bids.back() );
+			next_bid=(*player_it) -> takeTurn( bids.back() );
 			
 			//if a bid was made, store it, broadcast it and move on to the next player's turn
 			if(next_bid)
@@ -77,25 +66,25 @@ int main()
 			//if no bid was made then a challenge has been levelled...
 			
 			total=0;
-			for(unsigned int j=offset ; j<players.size() ; ++i)
+			for(unsigned int j=0 ; j<players.size() ; ++j)
 			{
 			//add the number of each appropriate die owned by the players to the total
-			total+=players[j] -> countDice( (*bids.back()) -> second);
+			total+=players[j] -> countDice( bids.back() -> second);
 			}
 			
-			if( (*bids.back()) -> second <= total )
+			if( bids.back() -> second <= total )
 			{
 				if( !( (*player_it) -> removeDice()) )
 				{
-					delete (player_it);
+					delete *player_it;
 					players.erase(player_it);
 				}
 			}
 			else
 			{
-				if( !(player_it-1 -> removeDice()) )
+				if( !(*(player_it-1)) -> removeDice())
 				{
-					delete *(players_it-1);
+					delete *(player_it-1);
 					players.erase(player_it-1);
 				}
 			}
@@ -109,10 +98,12 @@ int main()
 		
 		//reward winner
 		
-		//clean remaining player
-		delete players.front();
-		players.pop_back();
-		
+		//clean up the players
+		for(unsigned int i=0;i<players.size();++i)
+		{
+			delete players.back();
+			players.pop_back();
+		}
 		
 		//clean up bid array
 		for(auto iter=bids.begin(), end=bids.end() ; iter!=end ; ++iter)
@@ -123,35 +114,5 @@ int main()
 	}
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
-	//wait for the other thread to finish (which it should do soon as quit should now be set to true)
-	thread.join();
-	
 	return 0;
 }
-
-//function to run in separate thread watching for new clients
-watchForClients(std::atomic<bool>& quit,ThreadSafeList<int>& client_ids)
-{
-	int client_id;
-	
-	while(!quit.load())
-	{
-		//search for new clients somehow...
-		
-		if(/*something*/) client_ids.push_front(client_id);	//add the new client's id to the list
-	}
-}
-
-class addPlayer
-{
-	public:
-		addPlayer(wheel<Player*>& _players) : players(_players) {}
-		
-		void operator()(int client_id)
-		{
-			players.push_back(new Player(client_id));
-		}
-		
-	private:
-		wheel<Player*>& players;
-};
