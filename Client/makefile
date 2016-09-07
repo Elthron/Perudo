@@ -15,12 +15,6 @@ all: Client
 Client: $(OBJECTS)
 	$(CC) $(CFLAGS) -o Client $(OBJECTS)
 
-Basic_AI.o: Basic_AI.cpp Player.h
-	$(CC) $(CFLAGS) -c Basic_AI.cpp
-
-Player.o: Player.cpp Die.h Bid.h
-	$(CC) $(CFLAGS) -c Player.cpp
-
 #remove all old o files
 clean: 
-	$(RM) Perudo *.o *~
+	$(RM) Client *.o *~
