@@ -1,3 +1,5 @@
+#this is the makefile used to compile the server
+
 #compiler/flag macros
 CXX=g++-4.9
 CPPFLAGS=-Wall -Werror -Wextra -std=c++14 -O3 -pthread
