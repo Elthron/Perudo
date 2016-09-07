@@ -22,4 +22,4 @@ Human.o: Human.h Player.h clientManager.h
 
 .PHONY: clean
 clean:
-	rm ./*.o $(EDIR)/*.o $(OBJDIR)/*.o
+	rm Server ./*.o ~*
