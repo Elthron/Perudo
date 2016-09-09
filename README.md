@@ -1,6 +1,6 @@
 # Perudo
 
-Perudo webserver project with aspirations of creating competent machine intelligences so that we can finally destroy Other Joe and Rob at perudo.
+Perudo webserver project with aspirations of creating competent machine intelligences so that we can finally destroy other Joe and Rob at perudo.
 
 \#notbitter
 
