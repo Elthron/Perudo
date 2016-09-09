@@ -7,9 +7,9 @@ Perudo webserver project with aspirations of creating competent machine intellig
 #To Do:
 
 - finalise comunication between client and server [Joe]
-  - actually write a more purpose built client program [Joe]
+  - actually write a more purpose built client program [Joe(mostly)]
 - add an exit button for the server ( more threading? >:) ) [Ben]
-- throttle the various thread loops so that they don't overheat whatever they happen to be running on [Ben]
-- write an actually competant AI [anyone]
+- throttle the various thread loops so that they don't overheat whatever they happen to be running on [Anyone]
+- write an actually competant AI [Anyone]
 
 ######(also bugfix but that goes without saying :P )
