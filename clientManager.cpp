@@ -63,6 +63,7 @@ void clientManager::acceptJob(int _sockfd, int _newsockfd, unsigned int _clilen,
 		std::cout<<"client connected: fd= "<< _newsockfd <<std::endl;
 		_client_ids->push_front(_newsockfd);//adds the new file descriptor to list
 		std::cout<<sizeof(*_client_ids)<<std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));//basic throttling to reduce overheating/processor-hogging
 	}
 }
 
