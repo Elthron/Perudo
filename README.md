@@ -8,7 +8,6 @@ Perudo webserver project with aspirations of creating competent machine intellig
 
 - finalise comunication between client and server [Joe]
   - write a more purpose built client program [Joe(mostly)]
-- add an exit button for the server ( more threading? >:) ) [Ben]
 - throttle the various thread loops so that they don't overheat whatever they happen to be running on [Anyone]
 - write an actually competant AI [Anyone]
 
