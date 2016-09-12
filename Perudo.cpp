@@ -161,6 +161,9 @@ void perudo()
 			bids.erase(iter);
 		}
 		//-----------------------------------------------------)))
+		
+		//extremely basic throttling to reduce overheating/processor-hogging
+		std::this_thread::sleep_for(std::chrono::miliseconds(100));
 	}
 	//---------------------------------------------------------------------------------------------------------------------------
 }
