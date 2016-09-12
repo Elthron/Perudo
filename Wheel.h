@@ -17,11 +17,11 @@ class wheel
 			public:
 				friend class wheel;
 				
-				explicit iterator(wheel<T>& _wh,unsigned int _index=0) : wh(_wh),index(_index) {}
+				explicit iterator(wheel<T>* _wh,unsigned int _index=0) : wh(_wh),index(_index) {}
 				
 				iterator& operator++()
 				{
-					index=(index==wh.size()-1) ? 0 : index+1;
+					index=(index==wh->size()-1) ? 0 : index+1;
 					return *this;
 				}
 				
@@ -34,7 +34,7 @@ class wheel
 				
 				iterator& operator--()
 				{
-					index=(!index) ? wh.size()-1 : index-1;
+					index=(!index) ? wh->size()-1 : index-1;
 					return *this;
 				}
 				
@@ -58,11 +58,11 @@ class wheel
 				bool operator==(iterator other) const {return index==other.index;}
 				bool operator!=(iterator other) const {return !(*this==other);}
 				
-				T& operator*() const {return wh[index];}
+				T& operator*() const {return (*wh)[index];}
 				
 				
 			private:
-				wheel<T>& wh;
+				wheel<T>* wh;
 				unsigned int index;
 		};
 		
@@ -74,9 +74,9 @@ class wheel
 		
 		unsigned int size() {return vec.size();}
 		
-		iterator begin() {return iterator(*this);}
+		iterator begin() {return iterator(this);}
 		
-		iterator last() {return iterator(*this,vec.size()-1);}
+		iterator last() {return iterator(this,vec.size()-1);}
 		
 		T front() {return vec.front();}
 		

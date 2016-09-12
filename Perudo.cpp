@@ -2,18 +2,44 @@
 #include <vector>
 #include <list>
 #include <utility>
+#include <thread>
+#include <iostream>
 #include "clientManager.h"
 #include "Die.h"
 #include "Player.h"
 #include "Wheel.h"
 #include "Bid.h"
 
+void perudo();
+
+//main is used to control the state of the server at the highest level
+//currently it initialises the perudo code in a separate thread and then waits for a quit command
 int main()
 {
-	//seed the dice
+	//seed the dice (may as well do it here)
 	unsigned int seed=std::chrono::system_clock::now().time_since_epoch().count();
 	Die::seed(seed);
 	
+	//perudo thread (currently detched making its task embarrasingly parallel)
+	std::thread perudo_thread(perudo);
+	perudo_thread.detach();
+	
+	//loop until a "q" character is entered
+	char input;
+	do
+	{
+		std::cin>>input;
+	}
+	while(input!='q');
+	
+	return 0;
+}
+
+
+//perudo proccessing function
+//contains the main body of perudo playing code
+void perudo()
+{
 	//empty wheel of players
 	wheel<Player*> players;
 	
@@ -25,16 +51,15 @@ int main()
 	//variable for totalling the dice counts during a challenge
 	unsigned int total=0;
 	
-	//flag to control the while loop
-	bool quit=false;
-	
 	//the client manager
 	clientManager client_manager(8000);
 	
-	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	//main loop
-	while(!quit)
+	//MAIN LOOP
+	//---------------------------------------------------------------------------------------------------------------------------
+	while(true)
 	{
+		//PRE-GAME SETUP
+		//-----------------------------------------------------(((
 		//create the players
 		client_manager.populate(players);
 		
@@ -44,57 +69,81 @@ int main()
 			players[i]->roll();
 		}
 		
+		//current player iterator
 		wheel<Player*>::iterator player_it=players.begin();
+		//-----------------------------------------------------)))
 		
+		
+		
+		//GAME LOOP
+		//--------------------------------------------------------------------******(((
 		while(players.size()>1)
 		{
+			//STANDARD TURN ACTIONS
+			//-----------------------------------------------------(((
+			//tell the next player to take their turn
 			next_bid=(*player_it) -> takeTurn( bids.back() );
 			
-			//if a bid was made, store it, broadcast it and move on to the next player's turn
+			//broadcast the bid
+			for(unsigned int i=0;i<players.size();++i)
+			{
+				players[i]->sendBid(next_bid);
+			}
+			//-----------------------------------------------------)))
+			
+			
+			
+			//BID CODE
+			//-----------------------------------------------------(((
+			//if a bid was made, store it and move on to the next player's turn
 			if(next_bid)
 			{
 				bids.push_back(next_bid);
-				
-				for(unsigned int i=0;i<players.size();++i)
-				{
-					players[i]->sendBid(next_bid);
-				}
-				
-				continue;
 			}
+			//-----------------------------------------------------)))
 			
+			
+			
+			//CHALLENGE CODE
+			//-----------------------------------------------------(((
 			//if no bid was made then a challenge has been levelled...
-			
-			total=0;
-			for(unsigned int j=0 ; j<players.size() ; ++j)
-			{
-			//add the number of each appropriate die owned by the players to the total
-			total+=players[j] -> countDice( bids.back() -> second);
-			}
-			
-			if( bids.back() -> second <= total )
-			{
-				if( !( (*player_it) -> removeDice()) )
-				{
-					delete *player_it;
-					players.erase(player_it);
-				}
-			}
 			else
 			{
-				if( !(*(player_it-1)) -> removeDice())
+				//total the dice of the appropiate number
+				total=0;
+				for(unsigned int j=0 ; j<players.size() ; ++j)
 				{
-					delete *(player_it-1);
-					players.erase(player_it-1);
+					//add the number of each appropriate die owned by the players to the total
+					total+=players[j] -> countDice( bids.back() -> second);
+				}
+				
+				
+				//check who won
+				wheel<Player*>::iterator loser=players.begin();
+				if( bids.back() -> second <= total )loser=player_it;
+				else loser=player_it-1;
+				
+				//punish the loser
+				if( !(*loser) -> removeDice())
+				{
+					delete *loser;
+					players.erase(loser);
+				}
+				
+				//once the challenge is completed, re-roll the dice in preparation for the next round
+				for(unsigned int i=0;i<players.size();++i)
+				{
+					players[i]->roll();
 				}
 			}
-			
-			//once the challenge is completed, re-roll the dice
-			for(unsigned int i=0;i<players.size();++i)
-			{
-				players[i]->roll();
-			}
+			//-----------------------------------------------------)))
 		}
+		//--------------------------------------------------------------------******)))
+		
+		
+		
+		//POST GAME CLEAN-UP
+		//-----------------------------------------------------(((
 		
 		//reward winner
 		
@@ -111,8 +160,7 @@ int main()
 			delete *iter;
 			bids.erase(iter);
 		}
+		//-----------------------------------------------------)))
 	}
-	//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	
-	return 0;
+	//---------------------------------------------------------------------------------------------------------------------------
 }
