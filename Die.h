@@ -10,7 +10,6 @@ class Die
 	 public:
 		//call with the number of sides the die should have
 		explicit Die(unsigned int _sides=6);
-		~Die()=default;
 		
 		//roll the dice and return the result
 		unsigned int roll();
@@ -23,7 +22,7 @@ class Die
 	private:
 		//number of sides
 		unsigned int sides;
-		//initial value is set to 1
+		//the current value of the dice (note that it is initialised to 1)
 		unsigned int current_value;
 		
 		//the distribution the dice uses to generate random numbers

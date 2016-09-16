@@ -16,6 +16,8 @@ void perudo();
 //currently it initialises the perudo code in a separate thread and then waits for a quit command
 int main()
 {
+	std::cout<<"starting...\n";
+	
 	//seed the dice (may as well do it here)
 	unsigned int seed=std::chrono::system_clock::now().time_since_epoch().count();
 	Die::seed(seed);
@@ -24,6 +26,8 @@ int main()
 	std::thread perudo_thread(perudo);
 	perudo_thread.detach();
 	
+	std::cout<<"Server activated; enter \"q\" to exit.\n";
+	
 	//loop until a "q" character is entered
 	char input;
 	do
@@ -31,6 +35,8 @@ int main()
 		std::cin>>input;
 	}
 	while(input!='q');
+	
+	std::cout<<"exiting...\n";
 	
 	return 0;
 }

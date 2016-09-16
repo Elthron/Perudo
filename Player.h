@@ -10,6 +10,7 @@
 class Player
 {
 	public:
+		//c/dtor
 		Player(unsigned int die_size);
 		virtual ~Player();
 		

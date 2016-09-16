@@ -9,6 +9,7 @@ Player::~Player()
 
 void Player::roll()
 {
+	//iteratively roll the dice
 	for(unsigned int i=0 ; i<dice.size() ; ++i)
 	{
 		dice[i].roll();
@@ -23,8 +24,10 @@ bool Player::removeDice()
 
 unsigned int Player::countDice(unsigned int value)
 {
+	//tally variable
 	unsigned int count=0;
 	
+	//tally the dice with the correct values
 	for(auto iter=dice.begin(),end=dice.end() ; iter!=end ; ++iter)
 	{
 		if( (*iter).getValue()==value)++count;

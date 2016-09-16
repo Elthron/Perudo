@@ -1,6 +1,9 @@
 #include "Die.h"
 
+//initialisation of static member
 std::mt19937 Die::twister;
+
+//the rest is pretty self explanitory
 
 Die::Die(unsigned int _sides/*=6*/):
 	sides(_sides),
@@ -11,7 +14,7 @@ Die::Die(unsigned int _sides/*=6*/):
 unsigned int Die::roll()
 {
 	current_value=distribution(twister);
-	return current_value;
+	return getValue();
 }
 
 unsigned int Die::getValue() const
