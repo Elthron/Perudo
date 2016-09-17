@@ -29,6 +29,5 @@ bool operator==(const Bid& lhs, const Bid& rhs);
 bool operator!=(const Bid& lhs, const Bid& rhs);
 bool operator<=(const Bid& lhs, const Bid& rhs);
 bool operator>=(const Bid& lhs, const Bid& rhs);
-bool operator !(const Bid& bid);
 
 #endif
