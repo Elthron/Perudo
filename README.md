@@ -12,11 +12,13 @@ We will also be releasing a gaming console designed exclusively to run the perud
   - write a more purpose built client program [Joe(mostly)]
 - throttle the various thread loops [Anyone] -> done to a basic degree
 - write an actually competant AI [Anyone] -> on-going
+
+
 #Client To Do:
--Write client manager function
--Write Serialisation
--make data objects
--do prepend stuff
--make gui
+- Write client manager function
+- Write Serialisation
+- make data objects
+- do prepend stuff
+- make gui
 
 ######(also bugfix but that goes without saying :P )
