@@ -59,6 +59,7 @@ void perudo()
 	
 	//the client manager
 	clientManager client_manager(8000);
+	Human::setMgr(&client_manager);
 	
 	//MAIN LOOP
 	//---------------------------------------------------------------------------------------------------------------------------
