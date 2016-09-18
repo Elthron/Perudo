@@ -6,11 +6,10 @@ Perudo webserver project with aspirations of creating competent machine intellig
 
 We will also be releasing a gaming console designed exclusively to run the perudo client in order to satiate the inevitible flood of demand for this game in people's homes.
 
-#To Do:
+#Server To Do:
 
-- finalise comunication between client and server [Joe]
-  - write a more purpose built client program [Joe(mostly)]
-- throttle the various thread loops [Anyone] -> done to a basic degree
+- broadcast the player list on game start
+- broadcast the loss of dice
 - write an actually competant AI [Anyone] -> on-going
 
 
