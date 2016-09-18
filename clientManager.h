@@ -16,6 +16,8 @@
 #include "Wheel.h"
 #include "Human.h"
 
+class Message;
+
 class clientManager{
 	private:
 		//socket related stuff
@@ -38,7 +40,8 @@ class clientManager{
 		
 		//function to populate a wheel object with players from the thread safe list
 		void populate(wheel<Player*>& wheel);
-   		void whisper(std::string message, int clientfd); //send to specified client
+   		void whisper(Message& message, int clientfd); //send to specified client
+		void broadcast(Message& message); //send to all clients
    		std::string getResponse(int clientfd);
 };
 
@@ -61,6 +64,23 @@ class AddPlayer
 		
 	private:
 		wheel<Player*>& players;
+
+};
+
+//fucntor to whisper a message to all clients
+class Broadcast
+{
+	public:
+		Broadcast(Message& _message,clientManager& _mgr) : message(_message),mgr(_mgr) {}
+		
+		void operator()(int client_id)
+		{
+			mgr.whisper(message,client_id);
+		}
+		
+	private:
+		Message& message;
+		clientManager& mgr;
 };
 
 #endif

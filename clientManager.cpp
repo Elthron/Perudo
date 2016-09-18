@@ -1,4 +1,5 @@
 #include "clientManager.h"
+#include "Message.h"
 //jhb 02/09/2016
 //closes port now
 
@@ -67,28 +68,31 @@ void clientManager::acceptJob(int _sockfd, int _newsockfd, unsigned int _clilen,
 	}
 }
 
-void clientManager::whisper(std::string message, int clientfd){
-	//sends the same message to every client
-	//at the moment it can only send 8 chars for some reason
-	int n; //test number to check if the message was sent
-	std::cout<<"whispering "<<message<<std::endl;
+void clientManager::whisper(Message& message, int clientfd){
+	//sends a message to a client
 	
-	buf = message.c_str(); //relic of c? obtain a pointer to c char array
-
-	n = send(clientfd,buf,sizeof(message),0);
+	int n; //test number to check if the message was sent
+	
+	n = send(clientfd,message.getMessage(),message.getSize(),0);
 	std::cout<<sizeof(buf)<<"\t"<<n<<std::endl;
-
+	
 	if(n<0){
 		std::cout<<"something went horribly wrong"<<std::endl;
 	}
+}
 
+void clientManager::broadcast(Message& message){
+	//create functor
+	Broadcast broadcastMessage(message,*this);
+	//iterate over clients
+	client_ids.for_each<Broadcast>(broadcastMessage);
 }
 
 std::string clientManager::getResponse(int clientfd){
 	int n;
 	bzero(buffer,sizeof(buffer));
     n = recv(clientfd, buffer, sizeof(buf),0);
-   	//std::cout<<n<<"\t"<<buffer<<std::endl;
+   	
    	if(n<0){
    		return "failed to get response";
    	}

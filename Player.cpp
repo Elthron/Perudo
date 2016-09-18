@@ -1,7 +1,8 @@
 #include "Player.h"
 
-Player::Player(unsigned int die_size):
-	dice( 5, Die(die_size) )
+Player::Player(unsigned int die_size, std::string _name):
+	dice( 5, Die(die_size) ),
+	name(_name)
 {}
 
 Player::~Player()
@@ -34,4 +35,9 @@ unsigned int Player::countDice(unsigned int value)
 	}
 	
 	return count;
+}
+
+std::string Player::getName()
+{
+	return name;
 }

@@ -1,21 +1,46 @@
+#include <string>
+#include "clientManager.h"
+#include "Message.h"
 #include "Human.h"
 
 clientManager* Human::mgr;
 
 Human::Human(int _client_id):
-	Player(6),
+	Player(6,"Bob"),
 	client_id(_client_id)
 {}
 
-Bid* Human::takeTurn(Bid* last_bid)
+Bid* Human::takeTurn()
 {
-	if(last_bid)return nullptr;
-	else return new Bid(1,1);
+	//make the message
+	Message message;
+	message.storeBidInstruction();
+	
+	//send the message
+	mgr->whisper(message,client_id);
+	
+	std::string response=mgr->getResponse(client_id);
+	
+	return new Bid((unsigned int)response[1],(unsigned int)response[2]); //this probably doesn't work
 }
 
-void Human::sendBid(Bid* /*bid*/)
+void Human::roll()
 {
-	//idgaf
+	std::vector<int> values;
+	
+	//iteratively roll the dice and store the values
+	for(unsigned int i=0 ; i<dice.size() ; ++i)
+	{
+		dice[i].roll();
+		values.push_back(dice[i].getValue());
+	}
+	
+	//make a message
+	Message message;
+	message.storeDiceRoll(values);
+	
+	//send the message
+	mgr->whisper(message,client_id);
 }
 
 void Human::setMgr(clientManager* _mgr)

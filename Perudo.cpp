@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "Wheel.h"
 #include "Bid.h"
+#include "Message.h"
 
 void perudo();
 
@@ -77,6 +78,18 @@ void perudo()
 		
 		//current player iterator
 		wheel<Player*>::iterator player_it=players.begin();
+		
+		//blank message for broadcasting purposes
+		Message message;
+		
+		//tell the players about eachother
+		std::vector<std::string> names;
+		for( unsigned int i=0 ; i<players.size() ; ++i )
+		{
+			names.push_back(players[i]->getName());
+		}
+		message.storePlayerList(names);
+		client_manager.broadcast(message);
 		//-----------------------------------------------------)))
 		
 		
@@ -88,13 +101,11 @@ void perudo()
 			//STANDARD TURN ACTIONS
 			//-----------------------------------------------------(((
 			//tell the next player to take their turn
-			next_bid=(*player_it) -> takeTurn( bids.back() );
+			next_bid=(*player_it) -> takeTurn();
 			
 			//broadcast the bid
-			for(unsigned int i=0;i<players.size();++i)
-			{
-				players[i]->sendBid(next_bid);
-			}
+			(next_bid) ? message.storeNewBid(next_bid->first,next_bid->second,(*player_it)->getName()) : message.storeNewBid(0,0,(*player_it)->getName());
+			client_manager.broadcast(message);
 			//-----------------------------------------------------)))
 			
 			
@@ -128,6 +139,10 @@ void perudo()
 				wheel<Player*>::iterator loser=players.begin();
 				if( bids.back() -> second <= total )loser=player_it;
 				else loser=player_it-1;
+				
+				//broadcast the result of the challenge
+				message.storeLoseDice((*loser)->getName());
+				client_manager.broadcast(message);
 				
 				//punish the loser
 				if( !(*loser) -> removeDice())

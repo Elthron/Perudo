@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include <vector>
+#include <string>
 #include <utility>
 #include "Die.h"
 #include "Bid.h"
@@ -11,13 +12,11 @@ class Player
 {
 	public:
 		//c/dtor
-		Player(unsigned int die_size);
+		Player(unsigned int die_size, std::string _name);
 		virtual ~Player();
 		
 		//function to ask the client to take their turn based on the last bid
-		virtual Bid* takeTurn(Bid* last_bid)=0;
-		//function to inform the player of other bids
-		virtual void sendBid(Bid* bid)=0;
+		virtual Bid* takeTurn()=0;
 		
 		//function to roll the player's dice
 		virtual void roll();
@@ -26,9 +25,13 @@ class Player
 		//function used when a player has been challenged to return the number of dice a player has that show the given value
 		virtual unsigned int countDice(unsigned int value);
 		
-	private:
+		std::string getName();
+		
+	protected:
 		//the player's dice
 		std::vector<Die> dice;
+		//the player's identification
+		std::string name;
 };
 
 #endif
