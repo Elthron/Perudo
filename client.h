@@ -8,9 +8,14 @@
 #include <unistd.h>
 #include <string.h>
 #include <vector>
-#include <utility> //pairs in here
 #include <iostream>
+#include "Bid.h"
 
+struct playerInfo{
+	int numberOfDice;
+	std::string name;
+	Bid bid;
+};
 
 class client{
 
@@ -19,8 +24,13 @@ class client{
 		int sockfd, portno, n;
    		struct sockaddr_in serv_addr;
    		struct hostent *server;
-   		unsigned char buffer[256];
-   		//std::vector<std::pair<std::string name,int numberOfDice> > players;
+   		unsigned char buffer[255];
+   		
+   		//game info
+   		std::vector<playerInfo> players;
+   		int numberOfPlayers;
+   		int numberOfDice;
+   		std::vector<int> dice;
 
    		//these methods will be called by getServerData
 		bool updatePlayerNames();
@@ -32,10 +42,11 @@ class client{
 	public:
 		int connectToServer(int port, char *host[]);
 
-		
+		explicit client();
 		//this one super method a way of calling other stuff;
 		bool getServerData();
 
 };
+
 
 #endif
