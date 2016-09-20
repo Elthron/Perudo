@@ -14,10 +14,7 @@ We will also be releasing a gaming console designed exclusively to run the perud
 
 
 #Client To Do:
-- Write client manager function
-- Write Serialisation
-- make data objects
-- do prepend stuff
 - make gui
+- test client with the real perudo server to check our work works together properly (fingercrossed)
 
 ######(also bugfix but that goes without saying :P )
