@@ -7,9 +7,7 @@ Perudo webserver project with aspirations of creating competent machine intellig
 We will also be releasing a gaming console designed exclusively to run the perudo client in order to satiate the inevitible flood of demand for this game in people's homes.
 
 #Server To Do:
-
-- broadcast the player list on game start
-- broadcast the loss of dice
+- add player reward mechanisms
 - write an actually competant AI [Anyone] -> on-going
 
 
