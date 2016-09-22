@@ -14,7 +14,7 @@ Server: $(OBJECTS)
 
 #supporting rules
 Perudo.o: Die.h Player.h Wheel.h Bid.h Message.h
-Player.o: Player.h Die.h Bid.h
+Player.o: Player.h Die.h Bid.h Message.h
 Die.o: Die.h
 Bid.o: Bid.h
 clientManager.o: clientManager.h ThreadSafeList.h Human.h Message.h

@@ -10,8 +10,10 @@ class Human : public Player
 	public:
 		explicit Human(int _client_id);
 		
-		//function to ask the human to take their turn based on the last bid
+		//function to ask the human to take their turn 
 		virtual Bid* takeTurn();
+		//function to send a generaic message to the client side
+		virtual void notify(Message& message);
 		
 		void roll();
 		

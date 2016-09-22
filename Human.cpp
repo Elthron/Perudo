@@ -24,6 +24,11 @@ Bid* Human::takeTurn()
 	return new Bid((unsigned int)response[1],(unsigned int)response[2]); //this probably doesn't work
 }
 
+void Human::notify(Message& message)
+{
+	mgr->whisper(message,client_id);
+}
+
 void Human::roll()
 {
 	std::vector<int> values;

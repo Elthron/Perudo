@@ -11,7 +11,10 @@
 #include "Bid.h"
 #include "Message.h"
 
+//ONE of the following two functions is to be run in a thread by the program
+//the first will cause the server to run the main perudo game and the second can be used for testing
 void perudo();
+void test();
 
 //main is used to control the state of the server at the highest level
 //currently it initialises the perudo code in a separate thread and then waits for a quit command
@@ -19,12 +22,8 @@ int main()
 {
 	std::cout<<"starting...\n";
 	
-	//seed the dice (may as well do it here)
-	unsigned int seed=std::chrono::system_clock::now().time_since_epoch().count();
-	Die::seed(seed);
-	
-	//perudo thread (currently detched making its task embarrasingly parallel)
-	std::thread perudo_thread(perudo);
+	//main behavior thread (currently detched as its task is embarrasingly parallel)
+	std::thread perudo_thread(test);
 	perudo_thread.detach();
 	
 	std::cout<<"Server activated; enter \"q\" to exit.\n";
@@ -47,6 +46,10 @@ int main()
 //contains the main body of perudo playing code
 void perudo()
 {
+	//seed the dice
+	unsigned int seed=std::chrono::system_clock::now().time_since_epoch().count();
+	Die::seed(seed);
+	
 	//empty wheel of players
 	wheel<Player*> players;
 	
@@ -106,7 +109,10 @@ void perudo()
 			
 			//broadcast the bid
 			(next_bid) ? message.storeNewBid(next_bid->first,next_bid->second,(*player_it)->getName()) : message.storeNewBid(0,0,(*player_it)->getName());
-			client_manager.broadcast(message);
+			for(unsigned int i=0;i<players.size();++i)
+			{
+				players[i]->notify(message);
+			}
 			//-----------------------------------------------------)))
 			
 			
@@ -143,7 +149,10 @@ void perudo()
 				
 				//broadcast the result of the challenge
 				message.storeLoseDice((*loser)->getName());
-				client_manager.broadcast(message);
+				for(unsigned int i=0;i<players.size();++i)
+				{
+					players[i]->notify(message);
+				}
 				
 				//punish the loser
 				if( !(*loser) -> removeDice())
@@ -188,4 +197,42 @@ void perudo()
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 	//---------------------------------------------------------------------------------------------------------------------------
+}
+
+void test()
+{
+	//set up the client manager
+	clientManager client_manager(8000);
+	Human::setMgr(&client_manager);
+	
+	//blank message for broadcasting purposes
+	Message message;
+	
+	while(true)
+	{
+		//repeatedly send each message type to any current clients
+		message.storePlayerList( {"Frodo"} );
+		client_manager.broadcast(message);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));	//1s pauses between messages
+		
+		message.storeNewBid(2,4,"Frodo");
+		client_manager.broadcast(message);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		
+		message.storeNewBid(4,2,"Frodo");
+		client_manager.broadcast(message);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		
+		message.storeDiceRoll( {1,5,3,3,4} );
+		client_manager.broadcast(message);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		
+		message.storeLoseDice("Frodo");
+		client_manager.broadcast(message);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		
+		message.storeBidInstruction();
+		client_manager.broadcast(message);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5000));	//5s pause at end
+	}
 }

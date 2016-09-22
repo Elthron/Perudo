@@ -6,6 +6,7 @@
 #include <utility>
 #include "Die.h"
 #include "Bid.h"
+#include "Message.h"
 
 //abstract base class to descend humans and AIs form
 class Player
@@ -17,6 +18,8 @@ class Player
 		
 		//function to ask the client to take their turn based on the last bid
 		virtual Bid* takeTurn()=0;
+		//function to send a generaic message to a player object
+		virtual void notify(Message& message)=0;
 		
 		//function to roll the player's dice
 		virtual void roll();
