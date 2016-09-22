@@ -45,6 +45,11 @@ class client{
 		explicit client();
 		//this one super method a way of calling other stuff;
 		bool getServerData();
+		
+		//player info extractor functions
+		std::vector<playerInfo> getPlayerInfo();
+		playerInfo getPlayerInfo(int);
+
 
 };
 

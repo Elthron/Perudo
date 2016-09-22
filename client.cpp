@@ -1,8 +1,7 @@
 //client Stuff
+//commented out all std::cout, it will mess up ncurses
 #include "client.h"
-client::client(){
-//stuff
-	numberOfPlayers = 1;
+client::client():numberOfPlayers(1){
 }
 
 int client::connectToServer(int port, char *host[]){
@@ -12,11 +11,11 @@ int client::connectToServer(int port, char *host[]){
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	if(sockfd < 0){
-		std::cout<<"Error: failed to open socket"<<std::endl;
+		//std::cout<<"Error: failed to open socket"<<std::endl;
 		return 1;
 	}
 	if(server == NULL){
-		std::cout<<"Error: no such host"<<std::endl;
+		//std::cout<<"Error: no such host"<<std::endl;
 		return 2;
 	}
 
@@ -26,11 +25,11 @@ int client::connectToServer(int port, char *host[]){
    	serv_addr.sin_port = htons(portno);
 
    	   	if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-    	std::cout<<"Error: failed to connect to server"<<std::endl;
+    	//std::cout<<"Error: failed to connect to server"<<std::endl;
       	return 3;
    	}
 
-   	std::cout<<"connected to server"<<std::endl;
+   	//std::cout<<"connected to server"<<std::endl;
    	return 0;
 
 }
@@ -43,8 +42,8 @@ bool client::getServerData(){
 	if(n < 0){
 		return false;
 	}
-	std::cout<<"bytes recieved"<<n<<std::endl;
-	std::cout<<"message type: "<< static_cast<int> (buffer[0]) <<std::endl;
+	//std::cout<<"bytes recieved"<<n<<std::endl;
+	//std::cout<<"message type: "<< static_cast<int> (buffer[0]) <<std::endl;
 
 	switch(buffer[0]){
 
@@ -65,7 +64,7 @@ bool client::getServerData(){
 }
 
 bool client::updatePlayerNames(){
-	std::cout<<"updatingPlayerNames"<<std::endl;
+	//std::cout<<"updatingPlayerNames"<<std::endl;
 	//get number of players
 	/*OMG this fucking piece of shit, it wouldnt compile without
 	* -std=c++14 wtf am I on the cutting edge of oo programming?*/
@@ -73,8 +72,9 @@ bool client::updatePlayerNames(){
 
 	char *start = (char*) &buffer[2];
 	std::string allNames (start);
-	std::cout<<"number of players: "<< numberOfPlayers<<std::endl
-	<<"all names "<< allNames << std::endl;
+	//std::cout<<"number of players: "<< numberOfPlayers<<std::endl
+	//<<"all names "<< allNames << std::endl;
+	
 	//make the char buffer into a string so I can use string methods
 	
 	/*now for the assumptions:
@@ -89,17 +89,17 @@ bool client::updatePlayerNames(){
 		players.push_back(temp);
 	}
 	//prints player names
-	std::cout<<"players: "<<std::endl;
+	//std::cout<<"players: "<<std::endl;
 	std::vector<playerInfo>::iterator it;
 	for (it = players.begin(); it != players.end(); ++it){
-		std::cout<<it->name<<std::endl;
+		//std::cout<<it->name<<std::endl;
 	}
 	
 	return true;
 }
 
 bool client::updatePlayerBid(){
-	std::cout<<"updatePlayerBid"<<std::endl;
+	//std::cout<<"updatePlayerBid"<<std::endl;
 
 	int numberOfDice = static_cast<int> (buffer[1]);
 	int valueOfDice = static_cast<int> (buffer[2]);
@@ -107,7 +107,7 @@ bool client::updatePlayerBid(){
 	std::string playerName (start);
 
 	/*look through player list to update correct piece of info*/
-	std::cout<<playerName<<std::endl;
+	//std::cout<<playerName<<std::endl;
 	std::vector<playerInfo>::iterator it;	
 	for (it = players.begin(); it != players.end(); ++it){
 		/*if the playeName matches the name of one 
@@ -116,16 +116,16 @@ bool client::updatePlayerBid(){
 			it->bid.first = numberOfDice;
 			it->bid.second = valueOfDice;
 			
-			std::cout<<"number of Dice:"<<
-			it->bid.first <<". Value of Dice: "<<
-			it->bid.second<<std::endl;
+			//std::cout<<"number of Dice:"<<
+			//it->bid.first <<". Value of Dice: "<<
+			//it->bid.second<<std::endl;
 		}
 	}	
 	return true;
 }
 
 bool client::Reroll(){
-	std::cout<<"Reroll"<<std::endl;
+	//std::cout<<"Reroll"<<std::endl;
 	dice.clear();
 	numberOfDice = static_cast<int>(buffer[1]);
 	for (int i = 0; i < numberOfDice ;++i){
@@ -133,14 +133,14 @@ bool client::Reroll(){
 	}
 	std::vector<int>::iterator it;
 	for(it = dice.begin(); it != dice.end(); ++it){
-		std::cout<<*it<<std::endl;
+		//std::cout<<*it<<std::endl;
 	}
 	return true;
 }
 
 //this removes a dice
 bool client::updatePlayerDieNumber(){
-	std::cout<<"updatePlayerDieNumber"<<std::endl;
+	//std::cout<<"updatePlayerDieNumber"<<std::endl;
 	char *start = (char*) &buffer[1];
 	std::string playerName (start);
 	
@@ -157,7 +157,16 @@ bool client::updatePlayerDieNumber(){
 
 
 bool client::makeBid(){
-	std::cout<<"makeBid"<<std::endl;
+	//std::cout<<"makeBid"<<std::endl;
 	//some sort of make bid thing
 	return true;
+}
+
+
+std::vector<playerInfo> client::getPlayerInfo(){
+	return players;
+}
+
+playerInfo client::getPlayerInfo(int i){
+	return players[i];
 }
