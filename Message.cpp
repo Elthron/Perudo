@@ -35,7 +35,6 @@ void Message::storePlayerList(std::vector<std::string> players)
 		//replace the null terminator with a carridge return
 		std::string temp = *iter;
 		*temp.end() = '\r';
-		std::cout<<temp;
 		storeString(mem,temp);
 	}
 	
