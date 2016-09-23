@@ -32,7 +32,11 @@ void Message::storePlayerList(std::vector<std::string> players)
 	//add each of the strings
 	for(auto iter=players.begin(),end=players.end() ; iter!=end ; ++iter)
 	{
-		storeString(mem,*iter);
+		//replace the null terminator with a carridge return
+		std::string temp = *iter;
+		*temp.end() = '\r';
+		std::cout<<temp;
+		storeString(mem,temp);
 	}
 	
 	//null terminate the message
