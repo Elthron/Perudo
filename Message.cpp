@@ -32,9 +32,10 @@ void Message::storePlayerList(std::vector<std::string> players)
 	//add each of the strings
 	for(auto iter=players.begin(),end=players.end() ; iter!=end ; ++iter)
 	{
-		//replace the null terminator with a carridge return
+		//replace the null terminator with a new line character
+
 		std::string temp = *iter;
-		*temp.end() = '\r';
+		temp[temp.length()] = '\n';
 		storeString(mem,temp);
 	}
 	
