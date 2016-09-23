@@ -33,10 +33,15 @@ void Message::storePlayerList(std::vector<std::string> players)
 	for(auto iter=players.begin(),end=players.end() ; iter!=end ; ++iter)
 	{
 		//replace the null terminator with a new line character
-
+	/*
+		nothing I do fixes this, im not sure you can actually change the null terminator
+		at the end of string, I think we might need to store all this in a char array 
 		std::string temp = *iter;
 		temp[temp.length()] = '\n';
+	*/
 		storeString(mem,temp);
+		
+
 	}
 	
 	//null terminate the message
