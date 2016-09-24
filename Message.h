@@ -23,7 +23,7 @@ class Message
 		
 		void* getMessage();
 		size_t getSize();
-		friend ostream& operator<<(ostream& os, const Message& m);
+		friend std::ostream& operator<<(std::ostream& os, const Message& m);
 	private:
 		void* message;
 		size_t size;
