@@ -154,7 +154,7 @@ void storeInt(unsigned char* target, const int& value)
 void storeString(unsigned char* target, const std::string& string)
 {
 	//add 8 chars to the message
-	std::cout<<"string is:"<<string<<std::endl;
+	//std::cout<<"string is:"<<string<<std::endl;
 	for(unsigned int i=0 ; i<8 ; ++i)
 	{
 		if( i <= string.size() ) *target=string[i];
