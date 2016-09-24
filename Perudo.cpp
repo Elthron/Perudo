@@ -212,7 +212,7 @@ void test()
 	{
 		//repeatedly send each message type to any current clients
 		message.storePlayerList( {"12345678","qwertyui","asdfghj"} );
-		std::cout<<"message is"<<message;
+		//std::cout<<"message is"<<message;
 		client_manager.broadcast(message);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));	//1s pauses between messages
 		
