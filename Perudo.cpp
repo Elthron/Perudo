@@ -211,15 +211,15 @@ void test()
 	while(true)
 	{
 		//repeatedly send each message type to any current clients
-		message.storePlayerList( {"Frodo"} );
+		message.storePlayerList( {"12345678","qwertyui","asdfghj"} );
 		client_manager.broadcast(message);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));	//1s pauses between messages
 		
-		message.storeNewBid(2,4,"Frodo");
+		message.storeNewBid(2,4,"12345678");
 		client_manager.broadcast(message);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		
-		message.storeNewBid(4,2,"Frodo");
+		message.storeNewBid(4,2,"12345678");
 		client_manager.broadcast(message);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		
@@ -227,7 +227,7 @@ void test()
 		client_manager.broadcast(message);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		
-		message.storeLoseDice("Frodo");
+		message.storeLoseDice("12345678");
 		client_manager.broadcast(message);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		
