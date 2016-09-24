@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+class ostream;
+
 class Message
 {
 	public:
