@@ -161,7 +161,7 @@ void storeString(unsigned char* target, const std::string& string)
 		++target;
 	}
 }
-ostream& operator<<(ostream& os, const Message& m){
+std::ostream& operator<<(std::ostream& os, const Message& m){
 	
 	for(char* iter = static_cast<char*> (m.message); *iter ; ++iter){	
 		os<<*iter;
