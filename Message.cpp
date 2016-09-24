@@ -161,7 +161,13 @@ void storeString(unsigned char* target, const std::string& string)
 		++target;
 	}
 }
-
+ostream& operator<<(ostream& os, const Message& m){
+	
+	for(char* iter = static_cast<char*> (message); *iter ; ++iter){	
+		os<<*iter;
+	}
+	return os;
+}
 //piano instructions
 //histry is the dark
 //madness
