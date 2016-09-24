@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include "Message.h"
+#include <iostream>
 
 Message::Message():
 	message(nullptr),
