@@ -30,6 +30,9 @@ void Message::storePlayerList(std::vector<std::string> players)
 	storeInt(mem,players.size());
 	
 	//add each of the strings
+	
+	//make a temmporary string which is all the strings in the list combined
+	std::string temp;
 	for(auto iter=players.begin(),end=players.end() ; iter!=end ; ++iter)
 	{
 		//replace the null terminator with a new line character
@@ -39,11 +42,10 @@ void Message::storePlayerList(std::vector<std::string> players)
 		std::string temp = *iter;
 		temp[temp.length()] = '\n';
 	*/
-		storeString(mem,temp);
-		
-
+		*iter += static_cast<char> (255);//put an unlikely-to-be-used character at the end
+		temp += *iter;
 	}
-	
+	storeString(mem,temp);
 	//null terminate the message
 	*mem=0;
 }
