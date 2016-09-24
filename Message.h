@@ -30,4 +30,6 @@ class Message
 void storeInt(unsigned char* target, const int& value);
 void storeString(unsigned char* target, const std::string& value);
 
+ostream& operator<<(ostream& os, const Message& m);
+
 #endif
