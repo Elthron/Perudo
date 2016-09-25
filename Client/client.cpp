@@ -47,7 +47,7 @@ bool client::getServerData(){
 
 	switch(buffer[0]){
 
-		case 0:
+		case 5:
 			return this->updatePlayerNames();
 		case 1:
 			return this->updatePlayerBid();
