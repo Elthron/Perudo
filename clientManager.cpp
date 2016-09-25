@@ -11,9 +11,6 @@ clientManager::clientManager(int port):
 {
 	std::cout<<"finalising client Manager creation"<<std::endl;
 	
-	//set human object static member
-	Human::setMgr(this);
-	
 	if (sockfd < 0) {
 	  	perror("ERROR opening socket");
 	 	exit(1);
