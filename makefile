@@ -23,4 +23,4 @@ Message.o: Message.h
 
 .PHONY: clean
 clean:
-	rm Server *.o *~
+	rm -f Server *.o *~

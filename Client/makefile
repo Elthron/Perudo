@@ -24,4 +24,4 @@ Bid.o: Bid.h
 
 #remove all old o files
 clean: 
-	$(RM) Client *.o *~
+	rm -f Client *.o *~
