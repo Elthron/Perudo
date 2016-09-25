@@ -18,14 +18,21 @@ void Message::storePlayerList(std::vector<std::string> players)
 	//make sure the message is blank
 	if(message) free(message);
 	
-	size=3+8*players.size();
+	//find out the total size of all the strings
+	int strings_size=0;
+	for(unsigned int i=0 ; i<players.length() ; ++i)
+	{
+		strings_size+=players[i].size()+1;	//+1 to include null terminator
+	}
+	
+	size=3+strings_size;
 	message=calloc(size, sizeof(char));
 	
 	//get memory pointer
 	unsigned char* mem=static_cast<unsigned char*>(message);
 	
 	//add prepend
-	storeInt(mem,0);
+	storeInt(mem,5);
 	
 	//add number of players
 	storeInt(mem,players.size());
@@ -56,7 +63,7 @@ void Message::storeNewBid(int dice_number, int number_of_dice, std::string playe
 	//make sure the message is blank
 	if(message) free(message);
 	
-	size=5;
+	size=6+player.size();
 	message=calloc(size,sizeof(char));
 	
 	//get memory pointer
@@ -105,7 +112,7 @@ void Message::storeLoseDice(std::string player)
 	//make sure the message is blank
 	if(message) free(message);
 	
-	size=12;
+	size=3+player.size;
 	message=calloc(size,sizeof(char));
 	
 	//get memory pointer
@@ -132,7 +139,7 @@ void Message::storeBidInstruction()
 	//get memory pointer
 	unsigned char* mem=static_cast<unsigned char*>(message);
 	
-	//add prependz
+	//add prepend
 	storeInt(mem,4);
 	
 	//null terminate the message
@@ -153,13 +160,15 @@ void storeInt(unsigned char* target, const int& value)
 
 void storeString(unsigned char* target, const std::string& string)
 {
-	//add 8 chars to the message
-	//std::cout<<"string is:"<<string<<std::endl;
-	for(unsigned int i=0 ; i<8 ; ++i)
+	//add the string to the message
+	for(unsigned int i=0 ; i<string.length() ; ++i)
 	{
-		if( i <= string.size() ) *target=string[i];
+		*target=string[i];
 		++target;
 	}
+	//terminate the string
+	*target=255;
+	++target;
 }
 std::ostream& operator<<(std::ostream& os, const Message& m){
 	
@@ -168,7 +177,3 @@ std::ostream& operator<<(std::ostream& os, const Message& m){
 	}
 	return os;
 }
-//piano instructions
-//histry is the dark
-//madness
-//wtf ben :p
