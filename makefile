@@ -1,11 +1,11 @@
 #this is the makefile used to compile the server
 
 #compiler/flag macros
-CXX=g++
-CPPFLAGS=-Wall -Werror -Wextra -std=c++14 -O3 -pthread
+CXX = g++
+CPPFLAGS = -Wall -Werror -Wextra -std=c++14 -O3 -pthread
 
 #objects macro
-OBJECTS=Perudo.o Player.o Die.o Bid.o clientManager.o Human.o Message.o
+OBJECTS = Perudo.o Player.o Die.o Bid.o clientManager.o Human.o Message.o
 #---------------------------------------------------------------------
 
 #main rule

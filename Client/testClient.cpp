@@ -8,7 +8,7 @@ void updatePlayersWindow(WINDOW *w1,std::vector<playerInfo> players);
 void drawDice(WINDOW *w1,int xpos,int ypos,int value);
 Bid makeBid(WINDOW *w1);
 
-int main(int argc, char *argv[]){
+int main(int argc, char **){
 
 	/*test playerInfo*/
 	std::vector<playerInfo> players;
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
 	getmaxyx(stdscr,row,col);//stdscr is the terminal window
 
 	/*need 3 windows*/
-	int x2 = col/3;
+//	int x2 = col/3;
 	int y1 = row-ySplitPosition;
 	//newwin(height, width, starty, startx);
 	//nearly in the right place for all window sizes
