@@ -20,7 +20,7 @@ void Message::storePlayerList(std::vector<std::string> players)
 	
 	//find out the total size of all the strings
 	int strings_size=0;
-	for(unsigned int i=0 ; i<players.length() ; ++i)
+	for(unsigned int i=0 ; i<players.size() ; ++i)
 	{
 		strings_size+=players[i].size()+1;	//+1 to include null terminator
 	}
@@ -112,7 +112,7 @@ void Message::storeLoseDice(std::string player)
 	//make sure the message is blank
 	if(message) free(message);
 	
-	size=3+player.size;
+	size=3+player.size();
 	message=calloc(size,sizeof(char));
 	
 	//get memory pointer
