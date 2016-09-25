@@ -88,7 +88,7 @@ void clientManager::broadcast(Message& message){
 std::string clientManager::getResponse(int clientfd){
 	int n;
 	bzero(buffer,sizeof(buffer));
-    n = recv(clientfd, buffer, sizeof(buf),0);
+        n = recv(clientfd, buffer, sizeof(buf),0);
    	
    	if(n<0){
    		return "failed to get response";
