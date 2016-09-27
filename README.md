@@ -8,8 +8,7 @@ We will also be releasing a gaming console designed exclusively to run the perud
 
 #Server To Do:
 - add player reward mechanisms
-- work out why the server randomly turns off
-- work out where all the output messages are coming from and why they are in the wrong order
+- come up with some kind of protocall for clients disconnecting
 - write an actually competant AI [Anyone] -> on-going
 
 
