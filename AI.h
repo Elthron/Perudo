@@ -14,7 +14,7 @@ class AI : public Player
 		//the following function calls the private function which corresponds to the calling message object
 		final virtual void notify(Message& message);
 	
-	private:
+	protected:
 		//these functions are given no behavior by default and are there to be overridden by AIs that want to handle the information in some way
 		virtual void recievePlayerList(std::vector<std::string> players){}
 		virtual void recieveNewBid(int dice_number, int number_of_dice, std::string player){}
