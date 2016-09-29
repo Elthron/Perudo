@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "clientManager.h"
 #include "Message.h"
 //jhb 02/09/2016
@@ -6,14 +7,20 @@
 clientManager::clientManager(int port):
 	sockfd(socket(AF_INET, SOCK_STREAM, 0)),
 	portno(port),
-	quit(false),
-	thread(acceptJob,sockfd,newsockfd,clilen,cli_addr,&client_ids,&quit)
+	thread(acceptJob,sockfd,newsockfd,clilen,cli_addr,&client_ids)
 {
 	std::cout<<"finalising client Manager creation"<<std::endl;
 	
+	//detach the main client recieving thread there being no way to stop it
+	thread.detach();
+	
+	int random_int=1;
+	if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &random_int, sizeof(int)) <0 ){
+		throw std::domain_error("setsockopt messed up");
+	}
+	
 	if (sockfd < 0) {
-	  	perror("ERROR opening socket");
-	 	exit(1);
+		throw std::domain_error("error opening socket");
 	}
 	
 	/* Initialize socket structure */
@@ -25,23 +32,24 @@ clientManager::clientManager(int port):
 	
 	/* Now bind the host address using bind() call.*/
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-	  	perror("ERROR on binding");
-	  	exit(1);
+		throw std::domain_error("error on binding");
 	}
 	
 	std::cout<<"Bound server to "<<portno<<std::endl;
 }
 
 clientManager::~clientManager(){
-	//turn off the thread and wait for it to finish - make sure this is always first
-	quit.store(true);
-	thread.join();
+	std::cout<<"Destroying client manager:"<<std::endl;
 	
 	//instantiate an instance of CloseClients and perform it on the list
+	std::cout<<"\tClosing sockets..."<<std::endl;
 	CloseClients closeClients;
 	client_ids.for_each<CloseClients>(closeClients);
 	
+	//close the main socket
 	close(sockfd);
+	
+	std::cout<<"\tDone."<<std::endl;
 }
 
 void clientManager::populate(wheel<Player*>& wheel){
@@ -51,18 +59,26 @@ void clientManager::populate(wheel<Player*>& wheel){
 	client_ids.for_each<AddPlayer>(addPlayer);
 }
 
-void clientManager::acceptJob(int _sockfd, int _newsockfd, unsigned int _clilen, sockaddr_in _cli_addr, ThreadSafeList<int>* _client_ids, std::atomic<bool>* _quit){
-    while( !( _quit->load() ) ){
+void clientManager::acceptJob(int _sockfd, int _newsockfd, unsigned int _clilen, sockaddr_in _cli_addr, ThreadSafeList<int>* _client_ids){
+    while(true){
 		//this has no error checking what so ever.
-		std::cout<<"listening for clients"<<std::endl;
-		listen(_sockfd,2);//hangs while waiting for clients, 
+		
+		//hang while waiting for clients
+		std::cout<<"listening for clients..."<<std::endl;
+		listen(_sockfd,2);
+		
 		_clilen = sizeof(_cli_addr);
 		_newsockfd = accept(_sockfd, (struct sockaddr *)&_cli_addr, &_clilen);
 		std::cout<<"client connected: fd= "<< _newsockfd <<std::endl;
-		_client_ids->push_front(_newsockfd);//adds the new file descriptor to list
-		std::cout<<sizeof(*_client_ids)<<std::endl;
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));//basic throttling to reduce overheating/processor-hogging
+		
+		//adds the new file descriptor to list
+		_client_ids->push_front(_newsockfd);
+		
+		//basic throttling to reduce overheating/processor-hogging
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
+	
+	std::cout<<"\tAccept job loop ended."<<std::endl;
 }
 
 void clientManager::whisper(Message& message, int clientfd){

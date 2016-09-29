@@ -4,6 +4,7 @@
 #include <utility>
 #include <thread>
 #include <iostream>
+#include <atomic>
 #include "clientManager.h"
 #include "Die.h"
 #include "Player.h"
@@ -13,18 +14,18 @@
 
 //ONE of the following two functions is to be run in a thread by the program
 //the first will cause the server to run the main perudo game and the second can be used for testing
-void perudo();
-void test();
+void perudo(std::atomic<bool>* quit);
+void test(std::atomic<bool>* quit);
 
 //main is used to control the state of the server at the highest level
 //currently it initialises the perudo code in a separate thread and then waits for a quit command
 int main()
 {
-	std::cout<<"starting...\n";
+	std::cout<<"Starting...\n";
 	
-	//main behavior thread (currently detched as its task is embarrasingly parallel)
-	std::thread perudo_thread(test);
-	perudo_thread.detach();
+	//main behavior thread
+	std::atomic<bool> quit(false);
+	std::thread perudo_thread(test,&quit);
 	
 	std::cout<<"Server activated; enter \"q\" to exit.\n";
 	
@@ -36,15 +37,17 @@ int main()
 	}
 	while(input!='q');
 	
-	std::cout<<"exiting...\n";
+	quit.store(true);
+	std::cout<<"Exiting...\n";
+	perudo_thread.join();
 	
+	std::cout<<"Done.\n";
 	return 0;
 }
 
-
 //perudo proccessing function
 //contains the main body of perudo playing code
-void perudo()
+void perudo(std::atomic<bool>* quit)
 {
 	//seed the dice
 	unsigned int seed=std::chrono::system_clock::now().time_since_epoch().count();
@@ -67,7 +70,7 @@ void perudo()
 	
 	//MAIN LOOP
 	//---------------------------------------------------------------------------------------------------------------------------
-	while(true)
+	while( !(quit->load()) )
 	{
 		//PRE-GAME SETUP
 		//-----------------------------------------------------(((
@@ -197,43 +200,28 @@ void perudo()
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 	//---------------------------------------------------------------------------------------------------------------------------
+	
+	std::cout<<"\tPerudo loop ended."<<std::endl;
 }
 
-void test()
+void test(std::atomic<bool>* quit)
 {
 	//set up the client manager
-	clientManager client_manager(8000);
+	clientManager client_manager(8003);
 	Human::setMgr(&client_manager);
 	
 	//blank message for broadcasting purposes
 	Message message;
 	
-	while(true)
+	while( !(quit->load()) )
 	{
 		//repeatedly send each message type to any current clients
-		message.storePlayerList( {"12345678","qwertyui","asdfghj"} );
-		std::cout<<"message is"<<message<<std::endl;
+		message.storePlayerList( {"12345678","qwertyui","asd"} );
+		std::cout<<"Printing message:"<<std::endl;
+		std::cout<<message<<std::endl;
 		client_manager.broadcast(message);
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));	//1s pauses between messages
-		
-		message.storeNewBid(2,4,"12345678");
-		client_manager.broadcast(message);
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		
-		message.storeNewBid(4,2,"12345678");
-		client_manager.broadcast(message);
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		
-		message.storeDiceRoll( {1,5,3,3,4} );
-		client_manager.broadcast(message);
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		
-		message.storeLoseDice("12345678");
-		client_manager.broadcast(message);
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		
-		message.storeBidInstruction();
-		client_manager.broadcast(message);
-		std::this_thread::sleep_for(std::chrono::milliseconds(5000));	//5s pause at end
+		std::this_thread::sleep_for(std::chrono::milliseconds(2500));	//2.5s pauses between messages
 	}
+	
+	std::cout<<"Test loop ended."<<std::endl;
 }

@@ -11,7 +11,6 @@
 #include <list>
 #include <cstring>
 #include <thread>
-#include <atomic>
 #include "ThreadSafeList.h"
 #include "Wheel.h"
 #include "Human.h"
@@ -28,11 +27,10 @@ class clientManager{
 	   	struct sockaddr_in serv_addr,cli_addr;
 		
 		//threading stuff
-		std::atomic<bool> quit;
 		std::thread thread;
 		ThreadSafeList<int> client_ids;
 		
-		static void acceptJob(int _sockfd, int _newsockfd, unsigned int _clilen, sockaddr_in _cli_addr, ThreadSafeList<int>* _client_ids, std::atomic<bool>* _quit); //this method has its own thread
+		static void acceptJob(int _sockfd, int _newsockfd, unsigned int _clilen, sockaddr_in _cli_addr, ThreadSafeList<int>* _client_ids); //this method has its own thread
 		
 	public:
    		explicit clientManager(int port);

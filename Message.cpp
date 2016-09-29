@@ -1,6 +1,6 @@
 #include <cstdlib>
-#include "Message.h"
 #include <iostream>
+#include "Message.h"
 
 Message::Message():
 	message(nullptr),
@@ -15,6 +15,10 @@ Message::~Message()
 
 void Message::storePlayerList(std::vector<std::string> players)
 {
+	//set the AI components
+	id=5;
+	players_vec=players;
+	
 	//make sure the message is blank
 	if(message) free(message);
 	
@@ -26,154 +30,151 @@ void Message::storePlayerList(std::vector<std::string> players)
 	}
 	
 	size=3+strings_size;
-	message=calloc(size, sizeof(char));
-	
-	//get memory pointer
-	unsigned char* mem=static_cast<unsigned char*>(message);
+	message=static_cast<unsigned char*> (calloc(size, sizeof(unsigned char)));
+	unsigned char* message_temp=message;
 	
 	//add prepend
-	storeInt(mem,5);
+	storeInt(message_temp,-1);
 	
 	//add number of players
-	storeInt(mem,players.size());
+	storeInt(message_temp,players.size());
 	
 	//add each of the strings
-	
-	//make a temmporary string which is all the strings in the list combined
-	std::string temp;
-	for(auto iter=players.begin(),end=players.end() ; iter!=end ; ++iter)
+	for(unsigned int i=0 ; i<players.size() ; ++i)
 	{
-		//replace the null terminator with a new line character
-	/*
-		nothing I do fixes this, im not sure you can actually change the null terminator
-		at the end of string, I think we might need to store all this in a char array 
-		std::string temp = *iter;
-		temp[temp.length()] = '\n';
-	*/
-		*iter += static_cast<char> (255);//put an unlikely-to-be-used character at the end
-		temp += *iter;
+		storeString(message_temp,players[i]);
 	}
-	storeString(mem,temp);
-	//null terminate the message
-	*mem=0;
 }
 
 void Message::storeNewBid(int dice_number, int number_of_dice, std::string player)
 {
+	//set the AI components
+	id=1;
+	dice_number=dice_number_;
+	number_of_dice=number_of_dice_;
+	relevant_player=player;
+	
 	//make sure the message is blank
 	if(message) free(message);
 	
 	size=6+player.size();
-	message=calloc(size,sizeof(char));
-	
-	//get memory pointer
-	unsigned char* mem=static_cast<unsigned char*>(message);
+	message=static_cast<unsigned char*> (calloc(size,sizeof(char)));
+	unsigned char* message_temp=message;
 	
 	//add prepend
-	storeInt(mem,1);
+	storeInt(message_temp,1);
 	
 	//store data
-	storeInt(mem,dice_number);
-	storeInt(mem,number_of_dice);
-	storeString(mem,player);
-	
-	//null terminate the message
-	*mem=0;
+	storeInt(message_temp,dice_number);
+	storeInt(message_temp,number_of_dice);
+	storeString(message_temp,player);
 }
 
 void Message::storeDiceRoll(std::vector<int> values)
 {
+	//set the AI components
+	id=2;
+	roll_values=values;
+	
 	//make sure the message is blank
 	if(message) free(message);
 	
 	size=2+values.size();	//2 for prepend+append
-	message=calloc(size,sizeof(char));
-	
-	//get memory pointer
-	unsigned char* mem=static_cast<unsigned char*>(message);
+	message=static_cast<unsigned char*> (calloc(size,sizeof(char)));
+	unsigned char* message_temp=message;
 	
 	//add prepend
-	storeInt(mem,2);
+	storeInt(message_temp,2);
 	
 	//store data
-	storeInt(mem,values.size());
+	storeInt(message_temp,values.size());
 	
 	for(unsigned int i=0 ; i<5 ; ++i) //maximum of 5 dice values sent
 	{
-		if( i <= values.size() ) storeInt(mem,values[i]);
+		if( i <= values.size() ) storeInt(message_temp,values[i]);
 	}
-	
-	//null terminate the message
-	*mem=0;
 }
 
 void Message::storeLoseDice(std::string player)
 {
+	//set the AI components
+	id=3;
+	relevant_player=player;
+	
 	//make sure the message is blank
 	if(message) free(message);
 	
 	size=3+player.size();
-	message=calloc(size,sizeof(char));
-	
-	//get memory pointer
-	unsigned char* mem=static_cast<unsigned char*>(message);
+	message=static_cast<unsigned char*> (calloc(size,sizeof(char)));
+	unsigned char* message_temp=message;
 	
 	//add prepend
-	storeInt(mem,3);
+	storeInt(message_temp,3);
 	
 	//store data
-	storeString(mem,player);
-	
-	//null terminate the message
-	*mem=0;
+	storeString(message_temp,player);
 }
 
 void Message::storeBidInstruction()
 {
+	//set the AI components
+	id=4;
+	
 	//make sure the message is blank
 	if(message) free(message);
 	
 	size=2;
-	message=calloc(size,sizeof(char));
-	
-	//get memory pointer
-	unsigned char* mem=static_cast<unsigned char*>(message);
+	message=static_cast<unsigned char*> (calloc(size,sizeof(char)));
+	unsigned char* message_temp=message;
 	
 	//add prepend
-	storeInt(mem,4);
-	
-	//null terminate the message
-	*mem=0;
+	storeInt(message_temp,4);
 }
 
-void* Message::getMessage(){return message;}
+void* Message::getMessage(){return static_cast<void*>(message);}
 size_t Message::getSize(){return size;}
 
-void storeInt(unsigned char* target, const int& value)
+void storeInt(unsigned char*& target, const int& value)
 {
+	//cast value to a char
+	const unsigned char& _value=static_cast<const unsigned char&> (value);
+	
 	//store the int (this causes truncation if the int is more than 15)
-	*target=value;
+	*target=_value;
 	
 	//increment memory for consistency with other function
 	++target;
 }
 
-void storeString(unsigned char* target, const std::string& string)
+void storeString(unsigned char*& target, const std::string& string)
 {
+	
 	//add the string to the message
 	for(unsigned int i=0 ; i<string.length() ; ++i)
 	{
 		*target=string[i];
 		++target;
 	}
+	
 	//terminate the string
 	*target=255;
 	++target;
 }
+
 std::ostream& operator<<(std::ostream& os, const Message& m){
+	os<<"message size="<<m.size<<std::endl;
+	os<<"message content=";
 	
-	for(char* iter = static_cast<char*> (m.message); *iter ; ++iter){	
-		os<<*iter;
+	unsigned char* ptr=m.message;
+	
+	os<<*((int*)ptr)<<" ";
+	++ptr;
+	
+	while(*ptr){
+		os<<*ptr<<" ";
+		++ptr;
 	}
+	os<<std::endl;
+
 	return os;
 }

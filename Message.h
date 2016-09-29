@@ -24,14 +24,27 @@ class Message
 		void* getMessage();
 		size_t getSize();
 		friend std::ostream& operator<<(std::ostream& os, const Message& m);
+		
+		//message components for use by the AI object
+		//there is literally no point in these being private
+		//I know you're not supposed to do this because you might change your mind/can't predict future design decisions
+		//but I'm such an incredible genius that this will never happen to me
+		//therefore I will stand by this decision until it comes crashing down around my ears
+		//(and then never do this again)
+		unsigned int id;
+		std::vector<std::string> players_vec;
+		unsigned int dice_number_;
+		unsigned int number_of_dice_;
+		std::vector<int> roll_values;
+		std::string relevant_player;
+		
 	private:
-		void* message;
+		unsigned char* message;
 		size_t size;
-	
 };
 
-void storeInt(unsigned char* target, const int& value);
-void storeString(unsigned char* target, const std::string& value);
+void storeInt(unsigned char*& target, const int& value);
+void storeString(unsigned char*& target, const std::string& value);
 
 
 #endif
