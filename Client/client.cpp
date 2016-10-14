@@ -1,21 +1,24 @@
 //client Stuff
 //commented out all std::cout, it will mess up ncurses
+#include <iostream>
 #include "client.h"
-client::client():numberOfPlayers(1){
+#include "player.h"
+
+client::client(std::vector<player*>* p, self* me):pplayerVector(p),pself(me){
 }
 
-int client::connectToServer(int port, char *host[]){
+int client::connectToServer(int port, char *host[], std::string name){
 	//returns 0 on success
 	portno = port;
 	server = gethostbyname(*host);
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	if(sockfd < 0){
-		//std::cout<<"Error: failed to open socket"<<std::endl;
+		std::cout<<"Error: failed to open socket"<<std::endl;
 		return 1;
 	}
 	if(server == NULL){
-		//std::cout<<"Error: no such host"<<std::endl;
+		std::cout<<"Error: no such host"<<std::endl;
 		return 2;
 	}
 
@@ -25,11 +28,15 @@ int client::connectToServer(int port, char *host[]){
    	serv_addr.sin_port = htons(portno);
 
    	   	if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-    	//std::cout<<"Error: failed to connect to server"<<std::endl;
+    	std::cout<<"Error: failed to connect to server"<<std::endl;
       	return 3;
    	}
 
-   	//std::cout<<"connected to server"<<std::endl;
+   	std::cout<<"connected to server"<<std::endl;
+   	bzero(recbuf,sizeof(recbuf));
+   	strcpy(&recbuf[0] , name.c_str());
+   	//send your name to the server
+   	int n = send(sockfd,name.c_str(),sizeof(recbuf),0);
    	return 0;
 
 }
@@ -42,13 +49,19 @@ bool client::getServerData(){
 	if(n < 0){
 		return false;
 	}
-	//std::cout<<"bytes recieved"<<n<<std::endl;
-	//std::cout<<"message type: "<< static_cast<int> (buffer[0]) <<std::endl;
+	///////////message info
+	std::cout<<"raw message (char): ";
+	for(int i = 0; i < 255; ++i){
+		std::cout<<(char) buffer[i];
+	}
+	std::cout<<std::endl<<"message type: "<< static_cast<int> (buffer[0]) <<std::endl;
+	std::cout<<"bytes recieved: "<<n<<std::endl;
+	///////////
+	//message recieved from the server in char form
+
 
 	switch(buffer[0]){
 
-		case 5:
-			return this->updatePlayerNames();
 		case 1:
 			return this->updatePlayerBid();
 		case 2:
@@ -57,6 +70,8 @@ bool client::getServerData(){
 			return this->updatePlayerDieNumber();
 		case 4:
 			return this->makeBid();
+		case 5:
+			return this->updatePlayerNames();
 		default:
 			return false;
 	}
@@ -64,109 +79,135 @@ bool client::getServerData(){
 }
 
 bool client::updatePlayerNames(){
-	//std::cout<<"updatingPlayerNames"<<std::endl;
-	//get number of players
-	/*OMG this fucking piece of shit, it wouldnt compile without
-	* -std=c++14 wtf am I on the cutting edge of oo programming?*/
-	numberOfPlayers = static_cast<int> (buffer[1]); 
+	
+	std::vector<std::string> names;
 
 	char *start = (char*) &buffer[2];
 	std::string allNames (start);
-	//std::cout<<"number of players: "<< numberOfPlayers<<std::endl
-	//<<"all names "<< allNames << std::endl;
-	
-	//make the char buffer into a string so I can use string methods
-	
-	/*now for the assumptions:
-	* -all names are 8 characters
-	* -none of the characters are '\0'
+	//std::cout<<"all names: "<<allNames<<std::endl;
+
+	//In order to avoid O(2) algorithm, we are going to wipe the player list
+	//and start again
+
+	for(auto iter=pplayerVector->begin(),end=pplayerVector->end(); iter != end; ++iter){
+		if(*iter != pself){
+			delete *iter;
+			pplayerVector->erase(iter);
+		}
+	}
+
+	char * p;
+	/*
+	this really cool for loop takes the long string (allNames) recieved by the client
+	and it iterates backwards over it. when it hits char 255 it makes a new string 
+	with the pointer to that location. it replaces char 255 with a null terminator
+	and carries on going backwards. then it creates a new player with that name.
 	*/
-	
-	//adds players
-	for (int i = 0; i < numberOfPlayers; ++i){
-		playerInfo temp;
-		temp.name = allNames.substr(i*8,8);
-		players.push_back(temp);
+	allNames.pop_back();
+	for(auto it = allNames.rbegin();it != allNames.rend(); ++it ){
+		if(*it == (char) 255 && it !=allNames.rbegin()){
+			p = &(*(it-1));//-1 to get rid of char 255
+			std::string temp(p);
+			//std::cout<<"name: "<<temp<<std::endl;
+			*it = '\0';
+
+			//checks if the name is YOUR name and put your pointer on the back
+			if(temp == pself->getName()){
+				pplayerVector->push_back(pself);
+			}
+			else{
+				opponent *op = new opponent(5);
+				op->setName(temp);
+				pplayerVector->push_back(op);
+			}	
+
+		}
+		if(it == allNames.rend()-1){
+			p = &(*(it));
+			std::string temp(p);
+			//std::cout<<"name: "<<temp<<std::endl;
+			names.push_back(temp);
+			*it = '\0';		
+			
+			if(temp == pself->getName()){
+				pplayerVector->push_back(pself);
+			}
+			else{
+				opponent * op = new opponent(5);
+				op->setName(temp);
+				pplayerVector->push_back(op);
+			}
+		}	
 	}
-	//prints player names
-	//std::cout<<"players: "<<std::endl;
-	std::vector<playerInfo>::iterator it;
-	for (it = players.begin(); it != players.end(); ++it){
-		//std::cout<<it->name<<std::endl;
-	}
-	
+
 	return true;
+	
 }
 
 bool client::updatePlayerBid(){
-	//std::cout<<"updatePlayerBid"<<std::endl;
+	std::cout<<"updatePlayerBid"<<std::endl;
 
 	int numberOfDice = static_cast<int> (buffer[1]);
 	int valueOfDice = static_cast<int> (buffer[2]);
 	char *start = (char*) &buffer[3];
 	std::string playerName (start);
+	std::cout<<"player name: "<< playerName <<"\t bid: "<< numberOfDice << " " << valueOfDice<<std::endl;
 
-	/*look through player list to update correct piece of info*/
-	//std::cout<<playerName<<std::endl;
-	std::vector<playerInfo>::iterator it;	
-	for (it = players.begin(); it != players.end(); ++it){
-		/*if the playeName matches the name of one 
-		of the playerInfo structs, change tuhe bid*/
-		if(playerName == it->name){
-			it->bid.first = numberOfDice;
-			it->bid.second = valueOfDice;
-			
-			//std::cout<<"number of Dice:"<<
-			//it->bid.first <<". Value of Dice: "<<
-			//it->bid.second<<std::endl;
+	for (auto iter = pplayerVector->begin(); iter != pplayerVector->end();++iter){
+		if((*iter)->getName() == playerName){
+			(*iter)->setBid(Bid(numberOfDice,valueOfDice));
 		}
-	}	
+	}
+
 	return true;
 }
 
 bool client::Reroll(){
-	//std::cout<<"Reroll"<<std::endl;
-	dice.clear();
-	numberOfDice = static_cast<int>(buffer[1]);
-	for (int i = 0; i < numberOfDice ;++i){
-		dice.push_back(static_cast<int>(buffer[i+2]));
+	int numberOfDice = static_cast<int> (buffer[1]);
+	
+	std::vector<int> dice;
+
+	for(int i = 0; i < numberOfDice; ++i){
+		dice.push_back(static_cast<int> (buffer[2+i])); //2nd position is the start of the dice info
 	}
-	std::vector<int>::iterator it;
-	for(it = dice.begin(); it != dice.end(); ++it){
-		//std::cout<<*it<<std::endl;
-	}
+	pself->setDice(dice);
 	return true;
 }
 
-//this removes a dice
 bool client::updatePlayerDieNumber(){
-	//std::cout<<"updatePlayerDieNumber"<<std::endl;
-	char *start = (char*) &buffer[1];
-	std::string playerName (start);
-	
-	std::vector<playerInfo>::iterator it;	
-	for (it = players.begin(); it != players.end(); ++it){
-		/*if the playeName matches the name of one 
-		of the playerInfo structs, change tuhe bid*/
-		if(playerName == it->name){
-			it->numberOfDice =-1;
+	std::string player((char*) &buffer[1]); //doesnt work with static cast...?
+	std::cout<<"removing a dice from "<<player<<std::endl;
+	for(auto iter = pplayerVector->begin(); iter != pplayerVector->end(); ++iter){
+		if((*iter)->getName() == player){
+			(*iter)->removeDie(); //holy shit that worked
 		}
-	}	
-	return true;
+	}
+
+	return true;	
 }
 
 
 bool client::makeBid(){
-	//std::cout<<"makeBid"<<std::endl;
-	//some sort of make bid thing
+	int numberOfDice,valueOfDice;
+	std::cout<<"enter the number of Dice you want to play: ";
+	std::cin>>numberOfDice;
+	std::cout<<"enter the value of Dice you want to play: ";
+	std::cin>>valueOfDice;
+
+	bzero(recbuf,sizeof(recbuf));
+   	buffer[0]= (char) numberOfDice;
+   	buffer[1]= (char) valueOfDice;
+
+   	//send your name to the server
+   	int n = send(sockfd,buffer,2,0);
+
 	return true;
 }
 
-
-std::vector<playerInfo> client::getPlayerInfo(){
-	return players;
-}
-
-playerInfo client::getPlayerInfo(int i){
-	return players[i];
+void client::testFunc(){
+	//std::cout<<mess<<std::endl;
+	std::cout<<pplayerVector->size()<<std::endl;
+	for(auto iter = pplayerVector->begin(); iter!=pplayerVector->end(); ++iter){
+		std::cout<<(*iter)->getName();
+	}
 }

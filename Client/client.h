@@ -1,5 +1,5 @@
-#ifndef CLIENT_MANAGER_H
-#define CLIENT_MANAGER_H
+#ifndef CLIENT_H
+#define CLIENT_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,12 +10,8 @@
 #include <vector>
 #include <iostream>
 #include "Bid.h"
+#include "player.h"
 
-struct playerInfo{
-	int numberOfDice;
-	std::string name;
-	Bid bid;
-};
 
 class client{
 
@@ -24,13 +20,13 @@ class client{
 		int sockfd, portno, n;
    		struct sockaddr_in serv_addr;
    		struct hostent *server;
-   		unsigned char buffer[255];
-   		
+   		unsigned char buffer[255]; //data to send
+   		char recbuf[255]; //probs dont need this
+
    		//game info
-   		std::vector<playerInfo> players;
-   		int numberOfPlayers;
-   		int numberOfDice;
-   		std::vector<int> dice;
+   		std::vector<player*>* pplayerVector;
+   		self* pself;
+
 
    		//these methods will be called by getServerData
 		bool updatePlayerNames();
@@ -40,16 +36,14 @@ class client{
 		bool makeBid();
 
 	public:
-		int connectToServer(int port, char *host[]);
+		int connectToServer(int port, char *host[],std::string name);
 
-		explicit client();
+		explicit client(std::vector<player*>* p, self* me);
+		
 		//this one super method a way of calling other stuff;
 		bool getServerData();
-		
-		//player info extractor functions
-		std::vector<playerInfo> getPlayerInfo();
-		playerInfo getPlayerInfo(int);
 
+		void testFunc();
 
 };
 
